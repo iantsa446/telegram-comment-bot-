@@ -36,7 +36,7 @@ async def comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_input = " ".join(context.args)
     full_prompt = f"{RULES}"
 
-User's Input:
+User’s Input:
 {user_input}
 
 "Generate 10 comments as per all the rules."
