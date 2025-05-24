@@ -30,8 +30,7 @@ RULES = """Your rules for generating 10 comments are:
 # Command handler
 async def comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args) < 2:
-        await update.message.reply_text("Usage:
-/comment <User's Recommandations + Caption>")
+        await update.message.reply_text("Usage:/comment <User's Recommandations + Caption>")
         return
 
     user_input = " ".join(context.args)
