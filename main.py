@@ -54,12 +54,16 @@ User's Input:
 Generate 10 comments as per all the rules."""
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": full_prompt}],
-            temperature=0.8
-        )
-        result = response["choices"][0]["message"]["content"]
+       from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": full_prompt}]
+)
+
+result = response.choices[0].message.content
         await update.message.reply_text(result)
     except Exception as e:
         await update.message.reply_text(f"Error: {str(e)}")
