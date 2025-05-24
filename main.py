@@ -34,12 +34,12 @@ async def comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
 
     user_input = " ".join(context.args)
-    full_prompt = f"{RULES}
+    full_prompt = f"{RULES}"
 
 User's Input:
 {user_input}
 
-Generate 10 comments as per all the rules."
+"Generate 10 comments as per all the rules."
 
     try:
         response = openai.ChatCompletion.create(
