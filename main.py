@@ -1,45 +1,57 @@
 import os
 import logging
+import openai
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import openai
 
-# Load tokens from environment
+# Load tokens from environment variables
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 
-# Set up logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+# Logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
-# Constants
-RULES = """Your rules for generating 10 comments are:
+# RULES
+RULES = """
+Generate 10 comments following these rules:
 1. Language: English only.
-2. Relevance: Directly tied to caption/photo.
-3. Length: 70% short (30-50 chars), 30% long (60-100 chars).
-4. Gender: Respect the user split (ex: 50/50 or 75/25).
-5. Emojis: Present in all comments with proper distribution.
-6. One question (if caption allows).
-7. No repetition between similar posts.
-8. Natural tone.
-9. Max 2 emoji-only comments (only if allowed).
-10. Adapt to post tone. No rule restatement after.
+2. Relevance: Comments must directly relate to the photo and caption.
+3. Length:
+   - 70% short comments (30-50 characters),
+   - 30% long comments (60-100 characters).
+4. Gender: Mixed (Male first if 50/50).
+5. Emojis:
+   - 3 comments with 1 emoji,
+   - 3 comments with 2 emojis,
+   - 3 comments with 3 emojis,
+   - 1 free (with or without emojis).
+   - Use varied emoji types (face, symbols, objects, nature).
+6. Include 1 question if caption allows.
+7. No repeated comments.
+8. Tone: natural, human, engaging, dynamic.
+9. Never restate these rules in the output.
+10. Output must be only the 10 comments in raw text format.
 """
 
-# Command handler
+# /comment command handler
 async def comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if len(context.args) < 2:
-        await update.message.reply_text("Usage:/comment <User's Recommandations + Caption>")
+    if len(context.args) < 1:
+        await update.message.reply_text("Usage: /comment <User's Recommendations + Caption>")
         return
 
     user_input = " ".join(context.args)
-    full_prompt = f"{RULES}"
 
-"User’s Input:"
+    full_prompt = f"""{RULES}
+
+User's Input:
 {user_input}
 
-"Generate 10 comments as per all the rules."
+Generate 10 comments as per all the rules."""
 
     try:
         response = openai.ChatCompletion.create(
@@ -52,7 +64,7 @@ async def comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except Exception as e:
         await update.message.reply_text(f"Error: {str(e)}")
 
-# Main
+# Start the bot
 if __name__ == '__main__':
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("comment", comment))
